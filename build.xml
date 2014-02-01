@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="LazyDataModel" default="jar" basedir=".">
+
+    <description>LazyDataModel</description>
+
+
+    <property environment="env"/>
+    <property name="jaxb.home" value="."/>
+    <property name="version" value="0.1alpha"/>
+    <property name="display.name" value="LazyDataModel ${version}"/>
+    <property name="name" value="LazyDataModel"/>
+
+    <property name="bin.dir" value="bin"/>
+    <property name="lib.dir" value="lib"/>
+    <property name="build.dir" value="build"/>
+    <property name="classes.dir" value="${build.dir}/classes"/>
+
+    <property name="resources.dir" value="resources"/>
+    <property name="src.dir" value="src"/>
+
+    <property name="classes.prefix" value="ir/hatami/lazy"/>
+    <property name="src.classes.prefix" value="${classes.prefix}"/>
+
+
+    <property name="javac.debug" value="true"/>
+    <property name="javac.deprecation" value="false"/>
+    <property name="javac.version" value="1.7"/>
+
+    <path id="classpath">
+        <pathelement path="."/>
+    </path>
+
+    <path id="build.classpath">
+        <fileset dir="${lib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+
+    <path id="compile.classpath">
+        <path refid="build.classpath"/>
+        <pathelement location="${classes.dir}"/>
+    </path>
+
+    <patternset id="meta.files">
+        <include name="**/*.dtd"/>
+        <include name="**/*.xml"/>
+        <include name="**/*.xslt"/>
+        <include name="**/*.properties"/>
+    </patternset>
+
+    <patternset id="src.files">
+        <include name="**/*.java"/>
+    </patternset>
+
+    <target name="clean" description="Cleans up the build directory">
+        <delete dir="${build.dir}/classes/${src.classes.prefix}"/>
+        <delete>
+            <fileset dir="${build.dir}">
+                <include name="LazyDataModel.*"/>
+            </fileset>
+        </delete>
+    </target>
+
+    <target name="init" description="Initialize the build">
+        <echo message="Build ${display.name}"/>
+        <tstamp/>
+        <mkdir dir="${classes.dir}"/>
+        <copy todir="${classes.dir}">
+            <fileset dir="${src.dir}">
+                <patternset refid="meta.files"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="compile" depends="init, clean" description="Compile the Java source code">
+        <javac destdir="${classes.dir}"
+               classpathref="compile.classpath"
+               debug="${javac.debug}"
+               deprecation="${javac.deprecation}"
+               encoding="UTF-8"
+               source="1.7"
+               verbose="true"
+               fork="true"
+               optimize="true"
+               failonerror="false"
+               srcdir="${src.dir}"
+               nowarn="on"/>
+
+    </target>
+
+    <!-- ############################ Main Tragets #############################-->
+
+    <target name="jar" depends="compile">
+        <delete file="${build.dir}/${name}.jar" verbose="yes"/>
+
+        <jar jarfile="${build.dir}/${name}.jar">
+            <fileset dir="${classes.dir}">
+                <include name="**/hatami/**/*.class"/>
+            </fileset>
+            <manifest>
+                <attribute name="Built-By" value="Hamed Hatami"/>
+            </manifest>
+        </jar>
+
+        <copy file="${build.dir}/${name}.jar" todir="/home/hatami/project/CMS/lib" overwrite="yes" verbose="yes"/>
+        <copy file="${build.dir}/${name}.jar" todir="/home/hatami/project/CMSWorkstation/lib" overwrite="yes" verbose="yes"/>
+    </target>
+
+</project>
